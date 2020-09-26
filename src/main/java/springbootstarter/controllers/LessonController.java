@@ -1,8 +1,19 @@
 package springbootstarter.controllers;
 
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiModelProperty;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.Like;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import springbootstarter.entities.Course;
@@ -11,6 +22,9 @@ import springbootstarter.services.CourseService;
 import springbootstarter.services.LessonService;
 import springbootstarter.entities.Topic;
 import springbootstarter.services.TopicService;
+import springbootstarter.utils.LessonPagingResponse;
+import springbootstarter.utils.PagingHeaders;
+import springbootstarter.utils.TopicPagingResponse;
 
 
 import java.util.List;
@@ -27,6 +41,27 @@ public class LessonController {
     private TopicService topicService;
     @Autowired
     private CourseService courseService;
+
+
+    /*
+     * the api implicit prams and request params
+     * with name and description are meant for swagger UI to display them
+     * TODO:add the paging param to Swagger UI
+     * */
+    @GetMapping("/lessons")
+    @ApiImplicitParams(@ApiImplicitParam(dataType = "Sort", paramType = "query",name = "sort"))
+    public ResponseEntity<List<Lesson>> getLessons(
+            @And({
+                    @Spec(path = "name", params = "name", spec = Like.class) ,
+                    @Spec(path = "description", params = "description", spec = Like.class)
+            }) Specification<Lesson> spec,
+            Sort sort,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestHeader HttpHeaders headers) {
+        final LessonPagingResponse response = lessonService.get(spec, headers, sort);
+        return new ResponseEntity<>(response.getLessons(), returnHttpHeaders(response), HttpStatus.OK);
+    }
 
     @GetMapping("/topics/{topicId}/courses/{courseId}/lessons")
     public List<Lesson> getAllCourseLessons(@PathVariable Long topicId, @PathVariable Long courseId) {
@@ -64,5 +99,15 @@ public class LessonController {
     @DeleteMapping(value = "/topics/{topicId}/courses/{courseId}/lessons/{lessonId}")
     public void deleteLesson(@PathVariable Long lessonId) {
         lessonService.delete(lessonId);
+    }
+
+    public HttpHeaders returnHttpHeaders(LessonPagingResponse response) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(PagingHeaders.COUNT.getName(), String.valueOf(response.getCount()));
+        headers.set(PagingHeaders.PAGE_SIZE.getName(), String.valueOf(response.getPageSize()));
+        headers.set(PagingHeaders.PAGE_OFFSET.getName(), String.valueOf(response.getPageOffset()));
+        headers.set(PagingHeaders.PAGE_NUMBER.getName(), String.valueOf(response.getPageNumber()));
+        headers.set(PagingHeaders.PAGE_TOTAL.getName(), String.valueOf(response.getPageTotal()));
+        return headers;
     }
 }

@@ -32,7 +32,7 @@ public class Course {
 
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course",cascade = CascadeType.ALL)
     List<Lesson> lessons;
 
     public Course(String name, String description) {

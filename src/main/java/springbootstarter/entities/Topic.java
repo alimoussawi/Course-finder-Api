@@ -28,7 +28,7 @@ public class Topic {
     @Size(min = 3,max = 500,message = "description length must be between 3 and 500")
     private String description;
 
-    @OneToMany(mappedBy = "topic")
+    @OneToMany(mappedBy = "topic",cascade = CascadeType.ALL)
     @JsonManagedReference
     List<Course> courses;
 
