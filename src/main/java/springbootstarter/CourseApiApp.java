@@ -6,12 +6,15 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import springbootstarter.entities.Course;
 import springbootstarter.entities.Lesson;
 import springbootstarter.entities.Topic;
+import springbootstarter.entities.User;
 import springbootstarter.repositories.CourseRepository;
 import springbootstarter.repositories.LessonRepository;
 import springbootstarter.repositories.TopicRepository;
+import springbootstarter.repositories.UserRepository;
 
 import java.util.Arrays;
 
@@ -23,7 +26,11 @@ public class CourseApiApp {
     CourseRepository courseRepository;
     @Autowired
     LessonRepository lessonRepository;
+    @Autowired
+    UserRepository userRepository;
 
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
 
     public static void main(String[] args) {
         SpringApplication.run(CourseApiApp.class ,args);
@@ -41,7 +48,7 @@ public class CourseApiApp {
             Lesson lesson1 =new Lesson("lesson 1","lesson 1 description");
             Lesson lesson2 =new Lesson("lesson 2","lesson 2 description");
             Lesson lesson3 =new Lesson("lesson 3","lesson 3 description");
-
+            User user1=new User("ali",passwordEncoder.encode("123456"),"ADMIN","ADMIN");
             // making the relationships
           //  topic1.setCourses(Arrays.asList(course1,course2));
             course1.setTopic(topic1);
@@ -67,6 +74,7 @@ public class CourseApiApp {
             lessonRepository.save(lesson1);
             lessonRepository.save(lesson2);
             lessonRepository.save(lesson3);
+            userRepository.save(user1);
         };
     }
 }

@@ -33,6 +33,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class LessonController {
 
     @Autowired

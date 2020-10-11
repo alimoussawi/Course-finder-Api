@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin
 public class CourseController {
 
     @Autowired
@@ -111,3 +112,23 @@ public class CourseController {
     }
 
 }
+/*
+* @RequestMapping ("/fax")
+@Tag (name = "Fax stuff", description = "For managing fax machines.")
+public class MyController
+{
+
+  @Operation (summary = "Get information about currently existing fax machines")
+  @ApiResponse (responseCode = "200", description = "list of existing fax machines")
+  @GetMapping ("list")
+  public List<String> getFaxList (@RequestParam (name = "vendorName", required = false)
+  @Parameter (description = "vendor name to restrict the list") String vendorFilter)
+
+  {
+
+    return List.of ("Canon ABC", "Canon DEF", "Telekom 8", "Telekom 811", "Brother 5")
+      .stream ()
+      .filter (e -> e.contains (vendorFilter))
+      .collect (Collectors.toList ());
+  }
+  */
